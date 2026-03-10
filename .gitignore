@@ -1,0 +1,47 @@
+# Design docs and internal notes (not for public repo)
+DESIGN.md
+notes-*.md
+docs/superpowers/
+
+# Claude Code configuration
+CLAUDE.md
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.so
+venv/
+.venv/
+env/
+
+# Rust
+inferlet/target/
+*.wasm
+
+# Results and data (large files)
+results/*.csv
+results/*.png
+results/*.pdf
+harness/traces/traces/*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
