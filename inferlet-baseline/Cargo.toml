@@ -1,6 +1,6 @@
 [package]
-name = "modular-kv-cache"
-version = "0.8.0"
+name = "modular-kv-baseline"
+version = "0.2.0"
 edition = "2024"
 
 [lib]

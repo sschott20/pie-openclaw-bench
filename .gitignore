@@ -1,6 +1,5 @@
-# Design docs and internal notes (not for public repo)
-DESIGN.md
-notes-*.md
+# Context: design docs, notes, setup artifacts
+context/
 docs/superpowers/
 
 # Claude Code configuration
@@ -23,7 +22,11 @@ env/
 
 # Rust
 inferlet/target/
+inferlet-test/target/
+inferlet-baseline/target/
+inferlet/test-cache/
 *.wasm
+*.bak
 
 # Results and data (large files)
 results/*.csv

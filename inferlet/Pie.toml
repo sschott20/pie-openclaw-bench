@@ -1,6 +1,6 @@
 [package]
 name = "modular-kv-cache"
-version = "0.1.0"
+version = "0.8.0"
 description = "Modular KV cache inferlet for per-module prompt caching"
 authors = ["PIE OpenClaw Bench"]
 

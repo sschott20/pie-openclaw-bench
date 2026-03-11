@@ -27,11 +27,9 @@ class PIECacheBackend(Backend):
         self._conn = PieConnection(config.pie_server_uri)
         await self._conn.connect()
         await self._conn.launch_inferlet(
-            "modular-kv-cache",
+            "modular-kv-cache@0.8.0",
             wasm_path=str(INFERLET_WASM),
             manifest_path=str(INFERLET_MANIFEST),
-            arguments=["--model", self._model],
-            detached=True,
         )
 
     async def send_request(self, request: ModularRequest) -> StreamingResponse:

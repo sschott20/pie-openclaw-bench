@@ -54,7 +54,7 @@ class PieConnection:
         wasm_path: str | None = None,
         manifest_path: str | None = None,
         arguments: list[str] | None = None,
-        detached: bool = True,
+        detached: bool = False,
     ) -> None:
         """Launch an inferlet instance."""
         assert self._client is not None

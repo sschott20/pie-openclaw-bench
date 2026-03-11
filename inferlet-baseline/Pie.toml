@@ -1,0 +1,9 @@
+[package]
+name = "modular-kv-baseline"
+version = "0.2.0"
+description = "Baseline inferlet without KV caching (same protocol as modular-kv-cache)"
+authors = ["PIE OpenClaw Bench"]
+
+[runtime]
+core = "^0.2.0"
+mcp = "^0.2.0"
