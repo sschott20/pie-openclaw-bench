@@ -1,0 +1,68 @@
+[
+  {
+    "name": "multiturn_vllm",
+    "backend": "vllm",
+    "workload": "multiturn",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 20,
+    "arrival_rate": 0.0,
+    "warmup_programs": 3,
+    "num_repetitions": 5,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 15,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "multiturn_pie_std",
+    "backend": "pie_std",
+    "workload": "multiturn",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 20,
+    "arrival_rate": 0.0,
+    "warmup_programs": 3,
+    "num_repetitions": 5,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 15,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "multiturn_pie_cache",
+    "backend": "pie_cache",
+    "workload": "multiturn",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 20,
+    "arrival_rate": 0.0,
+    "warmup_programs": 3,
+    "num_repetitions": 5,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 15,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  }
+]
