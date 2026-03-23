@@ -87,24 +87,15 @@ class PIECacheBackend(Backend):
             self._client = None
 
     async def reset_state(self) -> None:
-        """Reset cache tracking and restart the persistent instance."""
+        """Reset cache tracking and clear in-memory KV cache."""
         self._cache_built.clear()
-        if not self._client:
+        if not self._instance:
             return
-        # Restart persistent instance for clean KV state
-        if self._instance:
-            try:
-                await self._instance.send(json.dumps({"mode": "shutdown"}))
-                await asyncio.wait_for(
-                    self._recv_until("__SHUTDOWN__"), timeout=5
-                )
-            except Exception:
-                pass
-            try:
-                await self._instance.terminate()
-            except Exception:
-                pass
-        self._instance = await self._launch_persistent()
+        try:
+            await self._instance.send(json.dumps({"mode": "clear_cache"}))
+            await self._recv_until("__CACHE_CLEARED__")
+        except Exception:
+            pass
 
     async def get_server_metrics(self) -> dict:
         return {}
