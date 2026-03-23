@@ -1,0 +1,200 @@
+[
+  {
+    "name": "sweep_short_vllm",
+    "backend": "vllm",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 5,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_short_pie_std",
+    "backend": "pie_std",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 5,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_short_pie_cache",
+    "backend": "pie_cache",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 5,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_medium_vllm",
+    "backend": "vllm",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 10,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_medium_pie_std",
+    "backend": "pie_std",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 10,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_medium_pie_cache",
+    "backend": "pie_cache",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 10,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_long_vllm",
+    "backend": "vllm",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 20,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_long_pie_std",
+    "backend": "pie_std",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 20,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "sweep_long_pie_cache",
+    "backend": "pie_cache",
+    "workload": "react",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 10,
+    "arrival_rate": 0.0,
+    "warmup_programs": 2,
+    "num_repetitions": 3,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "num_turns": 20,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  }
+]
