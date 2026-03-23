@@ -133,8 +133,6 @@ class PIECacheBackend(Backend):
             "is_first_module": is_first_module,
         }))
         await self._recv_until(inst, "__CACHE_BUILT__")
-        # Allow time for host to process the export command before cleanup
-        await asyncio.sleep(0.5)
         await inst.terminate()
         self._cache_built.add(export_key)
 
