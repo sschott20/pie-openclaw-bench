@@ -25,6 +25,7 @@ inferlet/target/
 inferlet-test/target/
 inferlet-baseline/target/
 inferlet/test-cache/
+inferlet/test-generate-loop/target/
 *.wasm
 *.bak
 

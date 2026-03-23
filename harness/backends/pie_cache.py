@@ -1,14 +1,12 @@
-"""PIE modular-cache backend — one-instance-per-request with PIE store caching.
+"""PIE modular-cache backend — persistent inferlet with per-module KV caching.
 
-Each send_request() launches a fresh inferlet instance that:
-1. Imports cached KV pages for the longest matching module prefix
-2. Fills remaining modules + user prompt (no flush)
-3. Generates via decode_step (all pending tokens in one forward pass)
-4. Returns response + cache metrics, then exits
+A single long-running inferlet instance handles all cache-build and generate
+requests. All KV state stays within one instance using intra-instance
+export/import — no cross-instance persistence needed.
 
-Cache is built lazily via separate cache_build instances (one per module layer).
-Each cache_build instance does exactly one flush() on a fresh context (which is
-reliable), then exports KV pages to PIE's persistent store.
+Cache is built lazily: before each request, any missing module-prefix KV layers
+are built via cache_build messages. Each cache_build uses decode_step() (not
+flush()) to commit tokens to KV, so it works reliably across unlimited calls.
 """
 
 from __future__ import annotations
@@ -44,11 +42,12 @@ def cache_key_for_prefix(hashes: list[str]) -> str:
 
 
 class PIECacheBackend(Backend):
-    """PIE with per-module modular KV cache, one instance per request."""
+    """PIE with per-module modular KV cache via a persistent inferlet."""
 
     def __init__(self):
         self._client = None
         self._installed = False
+        self._instance = None  # persistent inferlet instance
         # Track which cache keys have been built in this session
         self._cache_built: set[str] = set()
 
@@ -63,25 +62,57 @@ class PIECacheBackend(Backend):
         await self._client.install_program(INFERLET_WASM, INFERLET_MANIFEST)
         self._installed = True
 
+        # Launch the persistent inferlet instance
+        self._instance = await self._launch_persistent()
+
         # Warm up PIE server forward-pass pipeline
         await self._warmup()
 
     async def teardown(self) -> None:
+        if self._instance:
+            try:
+                await self._instance.send(json.dumps({"mode": "shutdown"}))
+                await asyncio.wait_for(
+                    self._recv_until("__SHUTDOWN__"), timeout=5
+                )
+            except Exception:
+                pass
+            try:
+                await self._instance.terminate()
+            except Exception:
+                pass
+            self._instance = None
         if self._client:
             await self._client.__aexit__(None, None, None)
             self._client = None
 
     async def reset_state(self) -> None:
-        """Clear cache tracking. PIE store is reset by server restart."""
+        """Reset cache tracking and restart the persistent instance."""
         self._cache_built.clear()
+        if not self._client:
+            return
+        # Restart persistent instance for clean KV state
+        if self._instance:
+            try:
+                await self._instance.send(json.dumps({"mode": "shutdown"}))
+                await asyncio.wait_for(
+                    self._recv_until("__SHUTDOWN__"), timeout=5
+                )
+            except Exception:
+                pass
+            try:
+                await self._instance.terminate()
+            except Exception:
+                pass
+        self._instance = await self._launch_persistent()
 
     async def get_server_metrics(self) -> dict:
         return {}
 
     # ── Instance management ──────────────────────────────────────
 
-    async def _launch(self) -> object:
-        """Launch a fresh inferlet instance and drain startup messages."""
+    async def _launch_persistent(self) -> object:
+        """Launch the persistent inferlet instance and drain startup messages."""
         inst = await self._client.launch_instance(INFERLET_NAME, arguments=[])
         try:
             while True:
@@ -90,11 +121,13 @@ class PIECacheBackend(Backend):
             pass
         return inst
 
-    async def _recv_until(self, inst, sentinel: str) -> list[str]:
-        """Receive messages from instance until one contains sentinel."""
+    async def _recv_until(self, sentinel: str) -> list[str]:
+        """Receive messages from persistent instance until one contains sentinel."""
         messages = []
         while True:
-            event, data = await asyncio.wait_for(inst.recv(), timeout=RECV_TIMEOUT)
+            event, data = await asyncio.wait_for(
+                self._instance.recv(), timeout=RECV_TIMEOUT
+            )
             ename = event.name if hasattr(event, "name") else str(event)
             text = data if isinstance(data, str) else data.decode() if data else ""
             if ename == "Message":
@@ -109,10 +142,8 @@ class PIECacheBackend(Backend):
 
     async def _warmup(self) -> None:
         """Warm up PIE server with a quick forward pass."""
-        inst = await self._launch()
-        await inst.send(json.dumps({"mode": "warmup"}))
-        await self._recv_until(inst, "__WARMUP_DONE__")
-        await inst.terminate()
+        await self._instance.send(json.dumps({"mode": "warmup"}))
+        await self._recv_until("__WARMUP_DONE__")
 
     # ── Cache building ───────────────────────────────────────────
 
@@ -123,17 +154,15 @@ class PIECacheBackend(Backend):
         export_key: str,
         is_first_module: bool,
     ) -> None:
-        """Launch one cache_build instance to add a module layer."""
-        inst = await self._launch()
-        await inst.send(json.dumps({
+        """Send a cache_build message to the persistent instance."""
+        await self._instance.send(json.dumps({
             "mode": "cache_build",
             "import_key": import_key,
             "module_content": module_content,
             "export_key": export_key,
             "is_first_module": is_first_module,
         }))
-        await self._recv_until(inst, "__CACHE_BUILT__")
-        await inst.terminate()
+        await self._recv_until("__CACHE_BUILT__")
         self._cache_built.add(export_key)
 
     async def _ensure_cache(self, modules: list) -> None:
@@ -163,16 +192,13 @@ class PIECacheBackend(Backend):
     # ── Request serving ──────────────────────────────────────────
 
     async def send_request(self, request: ModularRequest) -> StreamingResponse:
-        assert self._client is not None
+        assert self._instance is not None
 
         # Build any missing cache layers (not counted in request timing)
         await self._ensure_cache(request.modules)
 
         cache_hits, import_key = self._find_cache_hits(request.modules)
         remaining = request.modules[cache_hits:]
-
-        # Launch a fresh generate instance
-        inst = await self._launch()
 
         msg = json.dumps({
             "mode": "generate",
@@ -191,12 +217,12 @@ class PIECacheBackend(Backend):
         t_start = time.monotonic()
         first_token_received = False
 
-        await inst.send(msg)
+        await self._instance.send(msg)
 
         # Stream tokens until __DONE__ metrics
         while True:
             event, data = await asyncio.wait_for(
-                inst.recv(), timeout=RECV_TIMEOUT
+                self._instance.recv(), timeout=RECV_TIMEOUT
             )
             ename = event.name if hasattr(event, "name") else str(event)
             text = data if isinstance(data, str) else data.decode() if data else ""
@@ -223,5 +249,4 @@ class PIECacheBackend(Backend):
 
         response.total_latency_ms = (time.monotonic() - t_start) * 1000
 
-        await inst.terminate()
         return response
