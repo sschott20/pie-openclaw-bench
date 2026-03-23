@@ -4,9 +4,8 @@
 //! Uses the same JSON request/response protocol for fair comparison.
 
 use inferlet::stop_condition::{self, StopCondition};
-use inferlet::{Args, Result, Sampler};
+use inferlet::{Args, ChatFormatter, Result, Sampler};
 use serde::{Deserialize, Serialize};
-use std::time::Instant;
 
 #[derive(Deserialize)]
 struct Request {
@@ -63,8 +62,6 @@ async fn main(mut args: Args) -> Result<()> {
             default_max_tokens
         };
 
-        let prefill_start = Instant::now();
-
         // No caching: create fresh context and fill all modules as system prompt
         let mut ctx = model.create_context();
         let num_modules = request.modules.len() as u32;
@@ -75,22 +72,22 @@ async fn main(mut args: Args) -> Result<()> {
             .collect::<Vec<_>>()
             .join("\n");
 
-        // Use chat-formatted fill so the model gets proper template tokens
-        ctx.fill_system(&full_content);
+        // Use ChatFormatter for proper template tokens (consistent with cache inferlet)
+        let template = model.get_prompt_template();
+        let mut fmt = ChatFormatter::new();
+        fmt.system(&full_content);
+        let rendered = fmt.render(&template, false, true);
+        ctx.fill(&rendered);
         ctx.fill_user("Continue.");
 
-        let prefill_ms = prefill_start.elapsed().as_secs_f64() * 1000.0;
         let tokens_computed = ctx.get_token_ids().len() as u32;
 
-        let gen_start = Instant::now();
         let stop_cond = stop_condition::max_len(max_tokens)
             .or(stop_condition::ends_with_any(eos_tokens.clone()));
 
         // Use generate() which handles the decode loop internally
         let text = ctx.generate(Sampler::greedy(), stop_cond).await;
         inferlet::send(&text);
-
-        let generation_ms = gen_start.elapsed().as_secs_f64() * 1000.0;
 
         let metrics = ResponseMetrics {
             program_id: request.program_id,
@@ -99,8 +96,8 @@ async fn main(mut args: Args) -> Result<()> {
             cache_misses: num_modules,
             tokens_saved: 0,
             tokens_computed,
-            prefill_ms,
-            generation_ms,
+            prefill_ms: 0.0,  // Timing measured Python-side (Instant not reliable in WASM)
+            generation_ms: 0.0,
         };
         let metrics_json = serde_json::to_string(&metrics).expect("serialize metrics");
         inferlet::send(&format!("__DONE__{}", metrics_json));

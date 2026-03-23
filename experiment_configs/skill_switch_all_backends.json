@@ -1,0 +1,71 @@
+[
+  {
+    "name": "skill_switch_vllm",
+    "backend": "vllm",
+    "workload": "skill_switch",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 20,
+    "arrival_rate": 0.0,
+    "warmup_programs": 3,
+    "num_repetitions": 5,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "turns_per_phase": 5,
+      "num_phases": 3,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "skill_switch_pie_std",
+    "backend": "pie_std",
+    "workload": "skill_switch",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 20,
+    "arrival_rate": 0.0,
+    "warmup_programs": 3,
+    "num_repetitions": 5,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "turns_per_phase": 5,
+      "num_phases": 3,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  },
+  {
+    "name": "skill_switch_pie_cache",
+    "backend": "pie_cache",
+    "workload": "skill_switch",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "num_programs": 20,
+    "arrival_rate": 0.0,
+    "warmup_programs": 3,
+    "num_repetitions": 5,
+    "temperature": 0.0,
+    "max_response_tokens": 200,
+    "vllm_url": "http://localhost:8000",
+    "pie_server_uri": "ws://localhost:8080",
+    "workload_params": {
+      "turns_per_phase": 5,
+      "num_phases": 3,
+      "core_tokens": 500,
+      "tool_tokens": 2000,
+      "skill_tokens": 1500,
+      "memory_tokens": 200,
+      "response_tokens": 200
+    }
+  }
+]

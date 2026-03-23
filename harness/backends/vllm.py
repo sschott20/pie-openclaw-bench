@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import time
 
 import aiohttp
@@ -52,8 +53,6 @@ class VLLMBackend(Backend):
                 data = line[6:]
                 if data == "[DONE]":
                     break
-
-                import json
 
                 chunk = json.loads(data)
                 choices = chunk.get("choices", [])
