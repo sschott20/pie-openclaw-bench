@@ -27,7 +27,7 @@ class PIEStdBackend(Backend):
         self._conn = PieConnection(config.pie_server_uri)
         await self._conn.connect()
         await self._conn.launch_inferlet(
-            "modular-kv-baseline@0.2.0",
+            "modular-kv-baseline@0.3.0",
             wasm_path=str(BASELINE_WASM),
             manifest_path=str(BASELINE_MANIFEST),
         )
@@ -83,8 +83,17 @@ class PIEStdBackend(Backend):
     async def reset_state(self) -> None:
         """Shutdown and relaunch to clear state."""
         if self._conn:
-            await self._conn.send("__SHUTDOWN__")
+            try:
+                await self._conn.send("__SHUTDOWN__")
+            except Exception:
+                pass
             await self._conn.terminate()
+            # Relaunch so the next request has a live instance
+            await self._conn.launch_inferlet(
+                "modular-kv-baseline@0.3.0",
+                wasm_path=str(BASELINE_WASM),
+                manifest_path=str(BASELINE_MANIFEST),
+            )
 
     async def teardown(self) -> None:
         if self._conn:

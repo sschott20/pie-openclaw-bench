@@ -60,6 +60,7 @@ class RequestMetrics:
     ttft_ms: float
     total_latency_ms: float
     tokens_generated: int
+    generated_text: str = ""
     # PIE-cache specific (0 for other backends)
     cache_hits: int = 0
     cache_misses: int = 0

@@ -23,6 +23,7 @@ def collect_request_metrics(
         ttft_ms=response.ttft_ms,
         total_latency_ms=response.total_latency_ms,
         tokens_generated=response.tokens_generated,
+        generated_text=response.text,
         cache_hits=response.cache_hits,
         cache_misses=response.cache_misses,
         tokens_saved=response.tokens_saved,

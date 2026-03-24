@@ -62,22 +62,25 @@ async fn main(mut args: Args) -> Result<()> {
             default_max_tokens
         };
 
-        // No caching: create fresh context and fill all modules as system prompt
+        // No caching: create fresh context and fill all modules from scratch.
+        // Prompt construction matches the cache inferlet exactly:
+        //   module[0] → fill_system (ChatFormatter system template)
+        //   module[1..] → fill("\n\n" + content) (raw append)
+        //   user → fill_user("Continue.")
         let mut ctx = model.create_context();
         let num_modules = request.modules.len() as u32;
 
-        // Concatenate all module content
-        let full_content: String = request.modules.iter()
-            .map(|m| m.content.as_str())
-            .collect::<Vec<_>>()
-            .join("\n");
-
-        // Use ChatFormatter for proper template tokens (consistent with cache inferlet)
         let template = model.get_prompt_template();
-        let mut fmt = ChatFormatter::new();
-        fmt.system(&full_content);
-        let rendered = fmt.render(&template, false, true);
-        ctx.fill(&rendered);
+        for (i, module) in request.modules.iter().enumerate() {
+            if i == 0 {
+                let mut fmt = ChatFormatter::new();
+                fmt.system(&module.content);
+                let rendered = fmt.render(&template, false, true);
+                ctx.fill(&rendered);
+            } else {
+                ctx.fill(&format!("\n\n{}", module.content));
+            }
+        }
         ctx.fill_user("Continue.");
 
         let tokens_computed = ctx.get_token_ids().len() as u32;

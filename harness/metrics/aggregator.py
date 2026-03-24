@@ -82,6 +82,7 @@ def request_metrics_to_dataframe(
             "tokens_saved": m.tokens_saved,
             "tokens_computed": m.tokens_computed,
             "prefill_ratio": m.prefill_ratio,
+            "generated_text": m.generated_text,
         })
     return pd.DataFrame(rows)
 

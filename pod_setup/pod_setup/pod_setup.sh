@@ -62,18 +62,15 @@ scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P "$SERVER_PORT" \
     "$SCRIPT_DIR/pod_user_setup.sh" \
     root@"$SERVER_IP":/workspace/
 
-# Copy pod GitHub SSH key for git access (generated locally with ssh-keygen)
+# Stage pod GitHub SSH key in /workspace (user doesn't exist yet —
+# pod_root_setup.sh will move it to ~alexs/.ssh/ after creating the user)
 POD_KEY="$HOME/.ssh/pod_github"
 if [[ -f "$POD_KEY" ]]; then
-    print_status "Copying pod GitHub SSH key to server..."
-    ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p "$SERVER_PORT" root@"$SERVER_IP" \
-        "mkdir -p /home/alexs/.ssh"
+    print_status "Staging pod GitHub SSH key in /workspace..."
     scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P "$SERVER_PORT" \
-        "$POD_KEY" root@"$SERVER_IP":/home/alexs/.ssh/id_ed25519
+        "$POD_KEY" root@"$SERVER_IP":/workspace/pod_github
     scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P "$SERVER_PORT" \
-        "${POD_KEY}.pub" root@"$SERVER_IP":/home/alexs/.ssh/id_ed25519.pub
-    ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p "$SERVER_PORT" root@"$SERVER_IP" \
-        "chmod 600 /home/alexs/.ssh/id_ed25519 /home/alexs/.ssh/id_ed25519.pub && chown -R alexs:alexs /home/alexs/.ssh"
+        "${POD_KEY}.pub" root@"$SERVER_IP":/workspace/pod_github.pub
 else
     print_warning "Pod GitHub key not found at $POD_KEY. Git clones may fail."
     print_warning "Generate with: ssh-keygen -t ed25519 -f ~/.ssh/pod_github -N '' -C 'gc635@runpod'"

@@ -30,7 +30,7 @@ INFERLET_WASM = str(
 INFERLET_MANIFEST = str(
     Path(__file__).parent.parent.parent / "inferlet" / "Pie.toml"
 )
-INFERLET_NAME = "modular-kv-cache@0.8.0"
+INFERLET_NAME = "modular-kv-cache@0.9.0"
 
 STARTUP_DRAIN_TIMEOUT = 2  # seconds to drain startup messages
 RECV_TIMEOUT = 120  # seconds for generate/cache-build responses
