@@ -20,11 +20,11 @@ CHARS_PER_TOKEN = 4
 class PromptSizes:
     """Target token counts for each module type."""
 
-    core_tokens: int = 500
-    tool_tokens: int = 2000
-    skill_tokens: int = 1500
-    memory_tokens: int = 200
-    history_tokens_per_turn: int = 150
+    core_tokens: int = 2000
+    tool_tokens: int = 8000
+    skill_tokens: int = 4000
+    memory_tokens: int = 2000
+    history_tokens_per_turn: int = 300
     response_tokens: int = 200
 
 
