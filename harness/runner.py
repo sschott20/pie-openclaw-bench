@@ -62,8 +62,7 @@ def create_workload(
             )
         case "skill_switch":
             return SkillSwitchWorkload(
-                turns_per_phase=params.get("turns_per_phase", 5),
-                num_phases=params.get("num_phases", 3),
+                num_turns=params.get("num_turns", 15),
                 sizes=sizes,
             )
         case "heartbeat":
