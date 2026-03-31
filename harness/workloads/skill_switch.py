@@ -11,15 +11,7 @@ Module order: [core, tools, skill, history, memory, user_msg]
 from __future__ import annotations
 
 from harness.models import ModularRequest
-from harness.prompts.synthetic import (
-    PromptSizes,
-    make_core_instructions,
-    make_conversation_history,
-    make_tool_schemas,
-    make_skill,
-    make_memory,
-    make_user_message,
-)
+from harness.prompts import PromptSizes, get_module
 from harness.workloads.base import WorkloadGenerator
 
 # Skills rotate round-robin every turn
@@ -51,15 +43,16 @@ class SkillSwitchWorkload(WorkloadGenerator):
         return "skill_switch"
 
     def generate_program(self, program_id: str) -> list[ModularRequest]:
+        p = get_module(self.sizes.prompt_source)
         # Static modules (same every turn)
-        core = make_core_instructions(self.sizes.core_tokens)
-        tools = make_tool_schemas(self.sizes.tool_tokens)
-        memory = make_memory(self.sizes.memory_tokens)
-        user_msg = make_user_message("Continue working on the current task.")
+        core = p.make_core_instructions(self.sizes.core_tokens)
+        tools = p.make_tool_schemas(self.sizes.tool_tokens)
+        memory = p.make_memory(self.sizes.memory_tokens)
+        user_msg = p.make_user_message("Continue working on the current task.")
 
         # Pre-generate all skill variants
         skills = [
-            make_skill(name, self.sizes.skill_tokens)
+            p.make_skill(name, self.sizes.skill_tokens)
             for name in SKILL_ROTATION
         ]
 
@@ -69,7 +62,7 @@ class SkillSwitchWorkload(WorkloadGenerator):
             skill = skills[turn % len(SKILL_ROTATION)]
 
             # Growing history (realistic: grows each turn)
-            history = make_conversation_history(
+            history = p.make_conversation_history(
                 num_turns=min(turn + 1, 10),
                 tokens_per_turn=self.sizes.history_tokens_per_turn,
             )

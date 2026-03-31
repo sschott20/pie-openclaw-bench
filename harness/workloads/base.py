@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from harness.models import ModularRequest
-from harness.prompts.synthetic import PromptSizes
+from harness.prompts import PromptSizes
 
 
 class WorkloadGenerator(ABC):

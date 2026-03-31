@@ -85,12 +85,24 @@ async fn main(mut args: Args) -> Result<()> {
 
         let tokens_computed = ctx.get_token_ids().len() as u32;
 
-        let stop_cond = stop_condition::max_len(max_tokens)
-            .or(stop_condition::ends_with_any(eos_tokens.clone()));
+        // Generate token-by-token (streaming)
+        let mut generated_tokens: Vec<u32> = Vec::new();
 
-        // Use generate() which handles the decode loop internally
-        let text = ctx.generate(Sampler::greedy(), stop_cond).await;
-        inferlet::send(&text);
+        loop {
+            let token_id = ctx.decode_step(&Sampler::greedy()).await;
+            ctx.fill_token(token_id);
+            generated_tokens.push(token_id);
+
+            let token_text = ctx.tokenizer.detokenize(&[token_id]);
+            inferlet::send(&token_text);
+
+            if generated_tokens.len() >= max_tokens {
+                break;
+            }
+            if eos_tokens.iter().any(|eos| generated_tokens.ends_with(eos)) {
+                break;
+            }
+        }
 
         let metrics = ResponseMetrics {
             program_id: request.program_id,

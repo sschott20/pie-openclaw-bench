@@ -8,15 +8,7 @@ cache retention across tool execution pauses.
 from __future__ import annotations
 
 from harness.models import ModularRequest, PromptModule
-from harness.prompts.synthetic import (
-    PromptSizes,
-    make_core_instructions,
-    make_tool_schemas,
-    make_skill,
-    make_memory,
-    make_user_message,
-    make_tool_result,
-)
+from harness.prompts import PromptSizes, get_module
 from harness.workloads.base import WorkloadGenerator
 
 
@@ -36,12 +28,13 @@ class ReactWorkload(WorkloadGenerator):
         return "react"
 
     def generate_program(self, program_id: str) -> list[ModularRequest]:
+        p = get_module(self.sizes.prompt_source)
         # Static modules (same every turn)
-        core = make_core_instructions(self.sizes.core_tokens)
-        tools = make_tool_schemas(self.sizes.tool_tokens)
-        skill = make_skill("code_review", self.sizes.skill_tokens)
-        memory = make_memory(self.sizes.memory_tokens)
-        user_msg = make_user_message("Fix the failing test in src/auth/login.py")
+        core = p.make_core_instructions(self.sizes.core_tokens)
+        tools = p.make_tool_schemas(self.sizes.tool_tokens)
+        skill = p.make_skill("code_review", self.sizes.skill_tokens)
+        memory = p.make_memory(self.sizes.memory_tokens)
+        user_msg = p.make_user_message("Fix the failing test in src/auth/login.py")
 
         requests = []
         tool_history: list[PromptModule] = []
@@ -64,7 +57,7 @@ class ReactWorkload(WorkloadGenerator):
                 name=f"tool_call_{turn}",
                 content=f"Assistant called bash: pytest tests/auth/ -v (turn {turn})",
             )
-            tool_result = make_tool_result("bash")
+            tool_result = p.make_tool_result("bash")
             # Give each result a unique name so they're distinct modules
             tool_result = PromptModule(
                 name=f"tool_result_{turn}",

@@ -13,7 +13,7 @@ from harness.models import (
     ModularRequest,
     StreamingResponse,
 )
-from harness.prompts.synthetic import PromptSizes
+from harness.prompts import PromptSizes
 from harness.quality.evaluator import QualityEvaluator
 from harness.quality.models import QualityReport
 from harness.runner import create_backend, create_workload

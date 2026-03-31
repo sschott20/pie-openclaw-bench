@@ -8,15 +8,7 @@ while prefix caching goes cold between beats.
 from __future__ import annotations
 
 from harness.models import ModularRequest
-from harness.prompts.synthetic import (
-    PromptSizes,
-    make_core_instructions,
-    make_tool_schemas,
-    make_skill,
-    make_memory,
-    make_heartbeat_prompt,
-    make_updated_memory,
-)
+from harness.prompts import PromptSizes, get_module
 from harness.workloads.base import WorkloadGenerator
 
 
@@ -38,19 +30,20 @@ class HeartbeatWorkload(WorkloadGenerator):
         return "heartbeat"
 
     def generate_program(self, program_id: str) -> list[ModularRequest]:
+        p = get_module(self.sizes.prompt_source)
         # Static modules
-        core = make_core_instructions(self.sizes.core_tokens)
-        tools = make_tool_schemas(self.sizes.tool_tokens)
-        skill = make_skill("debugging", self.sizes.skill_tokens)
-        heartbeat = make_heartbeat_prompt()
-        base_memory = make_memory(self.sizes.memory_tokens)
+        core = p.make_core_instructions(self.sizes.core_tokens)
+        tools = p.make_tool_schemas(self.sizes.tool_tokens)
+        skill = p.make_skill("debugging", self.sizes.skill_tokens)
+        heartbeat = p.make_heartbeat_prompt()
+        base_memory = p.make_memory(self.sizes.memory_tokens)
 
         requests = []
 
         for beat in range(self.num_beats):
             # Occasionally update memory (every N beats)
             if beat > 0 and beat % self.memory_update_every == 0:
-                memory = make_updated_memory(
+                memory = p.make_updated_memory(
                     self.sizes.memory_tokens, update_index=beat
                 )
             else:

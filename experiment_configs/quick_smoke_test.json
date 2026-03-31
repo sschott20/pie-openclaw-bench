@@ -19,7 +19,8 @@
       "tool_tokens": 200,
       "skill_tokens": 200,
       "memory_tokens": 50,
-      "response_tokens": 50
+      "response_tokens": 50,
+      "prompt_source": "real"
     }
   }
 ]

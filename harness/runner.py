@@ -29,7 +29,7 @@ from harness.workloads.react import ReactWorkload
 from harness.workloads.multiturn import MultiTurnWorkload
 from harness.workloads.skill_switch import SkillSwitchWorkload
 from harness.workloads.heartbeat import HeartbeatWorkload
-from harness.prompts.synthetic import PromptSizes
+from harness.prompts import PromptSizes
 
 
 def create_backend(backend_type: BackendType) -> Backend:
